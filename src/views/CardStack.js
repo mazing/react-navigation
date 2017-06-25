@@ -42,6 +42,8 @@ type Props = {
   headerMode: HeaderMode,
   headerComponent?: ReactClass<*>,
   mode: 'card' | 'modal',
+  gestureResponseDistanceHorizontal: number,
+  gestureResponseDistanceVertical: number,
   navigation: NavigationScreenProp<NavigationState, NavigationAction>,
   router: NavigationRouter<
     NavigationState,
@@ -89,8 +91,8 @@ const RESPOND_THRESHOLD = 20;
 /**
  * The distance of touch start from the edge of the screen where the gesture will be recognized
  */
-const GESTURE_RESPONSE_DISTANCE_HORIZONTAL = 25;
-const GESTURE_RESPONSE_DISTANCE_VERTICAL = 135;
+const DEFAULT_GESTURE_RESPONSE_DISTANCE_HORIZONTAL = 25;
+const DEFAULT_GESTURE_RESPONSE_DISTANCE_VERTICAL = 135;
 
 const animatedSubscribeValue = (animatedValue: Animated.Value) => {
   if (!animatedValue.__isNative) {
@@ -237,7 +239,7 @@ class CardStack extends Component {
     if (headerMode === 'float') {
       floatingHeader = this._renderHeader(this.props.scene, headerMode);
     }
-    const { navigation, position, layout, scene, scenes, mode } = this.props;
+    const { navigation, position, layout, scene, scenes, mode, gestureResponseDistanceVertical, gestureResponseDistanceHorizontal } = this.props;
     const { index } = navigation.state;
     const isVertical = mode === 'modal';
 
@@ -274,8 +276,8 @@ class CardStack extends Component {
         const screenEdgeDistance = currentDragPosition - currentDragDistance;
         // Compare to the gesture distance relavant to card or modal
         const gestureResponseDistance = isVertical
-          ? GESTURE_RESPONSE_DISTANCE_VERTICAL
-          : GESTURE_RESPONSE_DISTANCE_HORIZONTAL;
+          ? gestureResponseDistanceVertical   || DEFAULT_GESTURE_RESPONSE_DISTANCE_VERTICAL
+          : gestureResponseDistanceHorizontal || DEFAULT_GESTURE_RESPONSE_DISTANCE_HORIZONTAL;
         // GESTURE_RESPONSE_DISTANCE is about 25 or 30. Or 135 for modals
         if (screenEdgeDistance > gestureResponseDistance) {
           // Reject touches that started in the middle of the screen
